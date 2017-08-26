@@ -1,10 +1,13 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const fetch = require('isomorphic-fetch');
-const mongoose = require('mongoose');
-const dbConf = require('./db.js');
-const expressSession = require('express-session');
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
+import fetch from 'isomorphic-fetch';
+import mongoose from 'mongoose';
+import {url} from './db';
+import expressSession from 'express-session';
+import schema from './schema';
+import graphqlHTTP from 'express-graphql';
+import fetchTopPods from './models/top-pods';
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,61 +15,67 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-require('dotenv').config()
+import {config} from 'dotenv';
 
 app.set('port', process.env.SERVER_PORT || 3001);
 
 const {
-  SECRET
+  SECRET_KEY
 } = process.env;
 
 mongoose.Promise = global.Promise;
-mongoose.connect(dbConf.url).then(
-	() => console.log('connected')
-)
+// mongoose.connect(dbConf.url, {
+// 	useMongoClient: true
+// }).then(
+// 	() => console.log('connected')
+// ).catch(err => console.error(err));
 
-// app.use(expressSession({
-//   secret: SECRET,
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: {
-//     httpOnly: true
-//   }
-// }));
+app.use(expressSession({
+  secret: SECRET_KEY,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true
+  }
+}));
 
 async function fetchItunesJsonAndParse(url) {
 	const fetchP = await fetch(url)
-	const json = fetchP.json();
-	return json;
+	return await fetchP.json();
 }
 
-app.get('/api/search', (req, res) => {
-	fetchItunesJsonAndParse(`https://itunes.apple.com/search?media=podcast&entity=podcast&term=${req.query.q}`).
-		then((results) => res.json(results)).
-		catch(e => console.error(e));
+app.get('/', (req, res) => {
+	res.send('ok');
 })
 
-app.get('/api/lookup', (req, res) => {
-	fetchItunesJsonAndParse(`https://itunes.apple.com/lookup?id=${req.query.id}&country=us&media=podcast&entity=podcastEpisode&limit=5`).
-		then((searchResults) => res.json(searchResults)).
-		catch(e => console.error(e));
+app.get('/api/search', async (req, res, next) => {
+	const searchJSON = await fetchItunesJsonAndParse(`https://itunes.apple.com/search?media=podcast&entity=podcast&term=${req.query.q}`);
+	res.json(searchJSON);
 })
 
-app.get('/api/top-podcasts', (req, res) => {
-	fetchItunesJsonAndParse('https://itunes.apple.com/us/rss/toppodcasts/limit=10/json')
-		.then((results) => {
-			console.log(results);
-			const modifiedFeed = results.feed.entry.map(entry => {
-				return {
-					collectionId: entry.id.attributes["im:id"],
-					collectionName: entry['im:name'].label,
-					artworkUrl100: entry['im:image'][entry['im:image'].length - 1].label
-				}
-			})
-			res.json(modifiedFeed);
-		})
+app.get('/api/lookup/:id', async (req, res) => {
+	let {limit} = req.query;
+	if (limit == null) {
+		limit = 5;
+	}
+	const lookup = await fetchItunesJsonAndParse(`https://itunes.apple.com/lookup?id=${req.params.id}&country=us&media=podcast&entity=podcastEpisode&limit=${limit}`);
+	console.log(lookup);
+	res.json(lookup);
 })
 
-const server = app.listen(app.get('port'), () => {
-	console.log(`Server listening on http://localhost:${server.address().port}`)
-});
+app.use('/api/graphql', graphqlHTTP({
+  schema,
+  graphiql: process.env.NODE_ENV !== 'production'
+}))
+
+app.get('/api/top-podcasts', async (req, res, next) => {
+	res.json(await fetchTopPods());
+})
+
+const start = function() {
+	const server = app.listen(app.get('port'), () => {
+		console.log(`Server listening on http://localhost:${server.address().port}`)
+	});
+}
+
+export default start;
