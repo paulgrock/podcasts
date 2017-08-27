@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import slugify from 'slugify';
+import CollectionListItem from './CollectionListItem';
 
 class Search extends Component {
 	state = {
@@ -23,6 +22,18 @@ class Search extends Component {
 					})
 					.catch(e => console.error(e))
 			}
+		} else {
+			fetch('/api/top-podcasts', {
+				mode: 'cors'
+			})
+				.then(r => r.json())
+				.then((searchResults) => {
+					this.setState({
+						searchResults
+					})
+				})
+				.catch(e => console.error(e))
+
 		}
 	}
 	// componentDidUpdate(prevProps, prevState) {
@@ -76,17 +87,7 @@ class Search extends Component {
 				</form>
 				<ol>
 					{this.state.searchResults.map((result) => (
-						<li key={result.collectionName}>
-							<Link to={{
-								pathname: `podcasts/${slugify(result.collectionName).toLowerCase()}`,
-								state: {
-									id: result.collectionId
-								}
-								}}>
-								<img src={result.artworkUrl100} alt={result.collectionName} />
-								{result.collectionName}
-							</Link>
-						</li>
+						<CollectionListItem key={result.collectionId} result={result} />
 					))}
 				</ol>
 			</div>

@@ -1,28 +1,31 @@
 import React, { Component } from 'react';
 import AudioPlayer from './AudioPlayer';
+import { gql, graphql } from 'react-apollo';
 
+
+let lookupQuery = gql`
+	query podcastQuery($id: Int!) {
+		podcast(id: $id) {
+			header {
+				collectionName
+				artworkUrl100
+				releaseDate
+			}
+			episodes {
+				trackId
+				trackName
+				description
+				releaseDate
+				episodeUrl
+				trackTimeMillis
+			}
+		}
+	}
+`
 class EpisodeList extends Component {
-	audioEl = null
 	state = {
-		episodes: [],
-		header: {},
 		playing: false,
 		trackId: false
-	}
-	componentDidMount() {
-		const collectionId = this.props.history.location.state.id;
-		fetch(`/api/lookup?id=${collectionId}`)
-			.then(r => r.json())
-			.then((searchResults) => {
-				const header = searchResults.results[0]
-				const results = searchResults.results.slice(1)
-				console.log(header);
-				this.setState({
-					header,
-					episodes: results
-				})
-			})
-			.catch(e => console.error(e))
 	}
 	componentDidUpdate(oldProps, oldState) {
 		if (this.state.trackId !== oldState.trackId) {
@@ -30,7 +33,6 @@ class EpisodeList extends Component {
 				playing: true
 			})
 		}
-
 	}
 	togglePlay = (src, trackId) => {
 		this.setState({
@@ -45,15 +47,19 @@ class EpisodeList extends Component {
 		return (seconds === 60 ? ( minutes + 1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
 	}
 	render() {
+		const { data: { error, loading, podcast}} = this.props;
 		return (
 			<div>
-				<header>
-					<h1>{this.state.header.collectionName}</h1>
-					<img src={this.state.header.artworkUrl100} alt={this.state.header.collectionName}/>
-					<p>Latest release: {this.state.header.releaseDate}</p>
-				</header>
+				{podcast && podcast.header ?
+					<header>
+						<h1>{podcast.header.collectionName}</h1>
+						<img src={podcast.header.artworkUrl100} alt={podcast.header.collectionName}/>
+						<p>Latest release: {podcast.header.releaseDate}</p>
+					</header>
+					: null
+				}
 				<ol>
-					{this.state.episodes.map((episode) => (
+					{podcast && podcast.episodes && podcast.episodes.map((episode) => (
 						<li key={episode.trackId}>
 							<h2>{episode.trackName}</h2>
 							<button onClick={() => this.togglePlay(episode.episodeUrl, episode.trackId)}>{
@@ -72,4 +78,10 @@ class EpisodeList extends Component {
 	}
 }
 
-export default EpisodeList;
+export default graphql(lookupQuery, {
+	options: (props) => ({
+		variables: {
+			id: props.history.location.state.id
+		}
+	})
+})(EpisodeList);
