@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import Search from './Search';
+import Home from './Home';
 import EpisodeList from './EpisodeList';
 import {
 	Route,
@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 import Header from './Header.js';
 import LoginSignupModal from './Login.js'
+import LoginPage from './Login.js'
 
 class App extends Component {
 
@@ -24,7 +25,6 @@ class App extends Component {
     }
   }
   render() {
-		console.log(this.props)
 		const { location } = this.props
     const isModal = !!(
       location.state &&
@@ -36,9 +36,9 @@ class App extends Component {
 				{isModal ? <Route path="/:login(signup|login)" component={LoginSignupModal} /> : null}
 				<Header />
 				<Switch location={isModal ? this.previousLocation : location}>
-					<Route path="/" exact component={Search} />
+					<Route path="/" exact component={Home} />
 					<Route path="/podcasts/:id" component={EpisodeList} />
-					<Route path="/:login(signup|login)" component={LoginSignupModal} />
+					<Route path="/:login(signup|login)" component={LoginPage} />
 				</Switch>
       </div>
     );

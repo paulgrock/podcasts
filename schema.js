@@ -9,8 +9,9 @@ import {
 
 import topPods from "./models/top-pods";
 import EpisodeListType from "./models/episodes-schema";
-import PodcastHeaderType from "./models/podcast-header";
+import PodcastListType from "./models/podcast";
 import episodeListing from "./models/lookup";
+import search from "./models/search";
 
 const TopPodType = new GraphQLObjectType({
 	name: "TopPod",
@@ -31,10 +32,19 @@ const PodcastType = new GraphQLObjectType({
 	name: "PodcastListing",
 	fields: {
 		header: {
-			type: PodcastHeaderType
+			type: PodcastListType
 		},
 		episodes: {
 			type: new GraphQLList(EpisodeListType)
+		}
+	}
+});
+
+const SearchType = new GraphQLObjectType({
+	name: "SearchListing",
+	fields: {
+		results: {
+			type: new GraphQLList(PodcastListType)
 		}
 	}
 });
@@ -78,11 +88,27 @@ var schema = new GraphQLSchema({
 				},
 				async resolve(_, args) {
 					var podcast = await episodeListing(args);
-					console.log(podcast)
 					return {
 						header: podcast.header,
 						episodes: podcast.episodes
 					}
+				}
+			},
+			search: {
+				name: "search",
+				deprecation: "Search for a podcast",
+				type: SearchType,
+				args: {
+					query: {
+						type: GraphQLString
+					},
+					limit: {
+						type: GraphQLInt
+					}
+				},
+				async resolve(_, {query, limit}) {
+					var {results} = await search(query, limit);
+					return {results}
 				}
 			}
 		},
