@@ -3,8 +3,8 @@ import CollectionListItem from './CollectionListItem';
 import { gql, graphql } from 'react-apollo';
 
 let topPodcastsQuery = gql`
-	query topPodsQuery($limit: Int!) {
-		topPods(limit: $limit) {
+	query topPodsQuery($limit: Int = 5, $offset: Int) {
+		topPods(limit: $limit, offset: $offset) {
 			collectionId
 			collectionName
 			artworkUrl100
@@ -12,23 +12,20 @@ let topPodcastsQuery = gql`
 	}
 `
 
-const TopPods = ({ data: { error, loading, topPods } }) => {
-	if (topPods) {
-		return (
+const TopPods = ({ data: { error, loading, topPods, fetchMore } }) => {
+	return (
+		topPods ? (
 			<ol>
 			{topPods.map((result) => (
 				<CollectionListItem key={result.collectionId} result={result} />
 			))}
 			</ol>
-		)
-	}
-	return null
+		) : null
+	)
 }
 
 export default graphql(topPodcastsQuery, {
 	options: (props) => ({
-		variables: {
-			limit: 5
-		}
+		variables: props
 	})
 })(TopPods);

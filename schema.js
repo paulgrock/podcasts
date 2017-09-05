@@ -59,19 +59,14 @@ var schema = new GraphQLSchema({
 				args: {
 					limit: {
 						type: GraphQLInt
+					},
+					offset: {
+						type: GraphQLInt
 					}
 				},
 				type: new GraphQLList(TopPodType),
-				async resolve(_, {
-					limit
-				}) {
-					return await topPods(limit);
-				}
-			},
-			anotherThing: {
-				type: GraphQLString,
-				resolve() {
-					return "another thing";
+				async resolve(_, args) {
+					return await topPods(args);
 				}
 			},
 			podcast: {
@@ -87,11 +82,7 @@ var schema = new GraphQLSchema({
 					}
 				},
 				async resolve(_, args) {
-					var podcast = await episodeListing(args);
-					return {
-						header: podcast.header,
-						episodes: podcast.episodes
-					}
+					return await episodeListing(args);
 				}
 			},
 			search: {
@@ -106,9 +97,8 @@ var schema = new GraphQLSchema({
 						type: GraphQLInt
 					}
 				},
-				async resolve(_, {query, limit}) {
-					var {results} = await search(query, limit);
-					return {results}
+				async resolve(_, args) {
+					return await search(args);
 				}
 			}
 		},

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import CollectionListItem from './CollectionListItem';
 import { gql, graphql } from 'react-apollo';
 
@@ -15,22 +15,17 @@ let searchQuery = gql`
 	}
 `
 
-class Search extends Component {
-	render() {
-		const { data: { error, loading, search } } = this.props;
-
-		return (
-			search && search.results ? (
-				<ol>
-					{search.results.map((result) => (
-						<CollectionListItem key={result.collectionId} result={result} />
-					))}
-				</ol>
-			) : null
-		)
-	}
+const Search = ({ data: { error, loading, search } }) => {
+	return (
+		search && search.results ? (
+			<ol>
+				{search.results.map((result) => (
+					<CollectionListItem key={result.collectionId} result={result} />
+				))}
+			</ol>
+		) : null
+	)
 }
-
 
 export default graphql(searchQuery, {
 	options: (props) => ({

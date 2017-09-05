@@ -32,7 +32,7 @@ class Home extends Component {
 		return (
 			<div>
 				<form action="" onSubmit={this.handleSearch}>
-					<input type="text" id="main-search" value={this.state.query} onChange={this.handleSearchChange} />
+					<input type="search" id="main-search" value={this.state.query} onChange={this.handleSearchChange} />
 					<button type='submit'>Submit</button>
 				</form>
 				{query
