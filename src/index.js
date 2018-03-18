@@ -11,7 +11,6 @@ const client = new ApolloClient({
 	uri: '/api/graphql'
 });
 
-
 ReactDOM.render(
 	<ApolloProvider client={client}>
 		<Router>

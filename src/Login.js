@@ -1,17 +1,27 @@
-import React from 'react';
+import React, {Component} from 'react';
 import './Modal.css';
 
-export default ({match, history}) => {
-	const close = (evt) => {
+class Login extends Component {
+	close = evt => {
 		evt.stopPropagation();
-		history.goBack()
-	}
-	return (
-		<div className="modal-container" onClick={close}>
-			<div className="modal">
-				<h3>Modal</h3>
-				<button onClick={close}>Close</button>
+		window.history.goBack();
+	};
+
+	render() {
+		const {username, password} = this.state;
+		return (
+			<div className="modal-container" onClick={this.close}>
+				<div className="modal">
+					<h3>Modal</h3>
+					<form>
+						<input type="text" value={username} />
+						<input type="password" value={password} />
+					</form>
+					<button onClick={this.close}>Close</button>
+				</div>
 			</div>
-		</div>
-	)
+		);
+	}
 }
+
+export default Login;
