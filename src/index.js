@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { ApolloClient, createNetworkInterface, ApolloProvider } from 'react-apollo';
-const networkInterface = createNetworkInterface({
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from 'react-apollo';
+import registerServiceWorker from './registerServiceWorker';
+
+const client = new ApolloClient({
 	uri: '/api/graphql'
 });
-const client = new ApolloClient({
-	networkInterface: networkInterface
-});
+
 
 ReactDOM.render(
 	<ApolloProvider client={client}>
@@ -19,3 +20,5 @@ ReactDOM.render(
 	</ApolloProvider>,
   document.getElementById('root')
 );
+
+registerServiceWorker();

@@ -1,6 +1,7 @@
 import React from 'react';
 import CollectionListItem from './CollectionListItem';
-import { gql, graphql } from 'react-apollo';
+import { Query } from 'react-apollo';
+import { gql } from 'apollo-boost';
 
 let topPodcastsQuery = gql`
 	query topPodsQuery($limit: Int = 5, $offset: Int) {
@@ -12,20 +13,20 @@ let topPodcastsQuery = gql`
 	}
 `
 
-const TopPods = ({ data: { error, loading, topPods, fetchMore } }) => {
-	return (
-		topPods ? (
-			<ol>
-			{topPods.map((result) => (
-				<CollectionListItem key={result.collectionId} result={result} />
-			))}
-			</ol>
-		) : null
-	)
-}
+const TopPods = () => (
+	<Query query={topPodcastsQuery}>
+		{({error, loading, data}) => {
+			if (loading) return <div>Loading...</div>;
+			if (error) return <div>Error</div>;
+			return (
+				<ol>
+					{data.topPods.map((result) => (
+						<CollectionListItem key={result.collectionId} result={result} />
+					))}
+				</ol>
+			)
+		}}
+	</Query>
+)
 
-export default graphql(topPodcastsQuery, {
-	options: (props) => ({
-		variables: props
-	})
-})(TopPods);
+export default TopPods;

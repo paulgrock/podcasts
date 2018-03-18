@@ -1,6 +1,7 @@
 import React from 'react';
 import CollectionListItem from './CollectionListItem';
-import { gql, graphql } from 'react-apollo';
+import { Query } from 'react-apollo';
+import { gql } from 'apollo-boost';
 
 let searchQuery = gql`
 	query podcastQuery($query: String!, $limit: Int = 10) {
@@ -15,23 +16,19 @@ let searchQuery = gql`
 	}
 `
 
-const Search = ({ data: { error, loading, search } }) => {
-	return (
-		search && search.results ? (
-			<ol>
-				{search.results.map((result) => (
-					<CollectionListItem key={result.collectionId} result={result} />
-				))}
-			</ol>
-		) : null
-	)
-}
+const Search = ({limit, query}) => (
+	<Query query={searchQuery} variables={{ limit, query }}>
+		{({error, loading, data}) => {
+			if (loading || error) return <div />
+			return (
+				<ol>
+					{data.search.results.map((result) => (
+						<CollectionListItem key={result.collectionId} result={result} />
+					))}
+				</ol>
+			)
+		}}
+	</Query>
+)
 
-export default graphql(searchQuery, {
-	options: (props) => ({
-		variables: {
-			limit: props.limit,
-			query: props.query
-		}
-	})
-})(Search);
+export default Search;
