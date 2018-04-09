@@ -1,2 +1,2 @@
-require = require("esm")(module/*, options*/);
+require = require("esm")(module);
 require("./server.js").default();
