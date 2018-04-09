@@ -1,3 +1,2 @@
-require("@std/esm");
-
-require('./server.js').default();
+require = require("esm")(module);
+require("./server.js").default();

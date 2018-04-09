@@ -1,98 +1,34 @@
-import React, { Component } from 'react';
+import React from 'react';
 import CollectionListItem from './CollectionListItem';
+import { Query } from 'react-apollo';
+import { gql } from 'apollo-boost';
 
-class Search extends Component {
-	state = {
-		searchResults: [],
-		search: ''
-	}
-	componentDidMount() {
-		if (window.location.search) {
-			const params = new Map(window.location.search.slice(1)
-									.split('&')
-									.map((param) => param.split('=')))
-			const query = params.get('q');
-			if (query) {
-				this.fetchSearchResults(query)
-					.then((searchResults) => {
-						this.setState({
-							searchResults: searchResults.results,
-							search: decodeURIComponent(query)
-						})
-					})
-					.catch(e => console.error(e))
+let searchQuery = gql`
+	query podcastQuery($query: String!, $limit: Int = 10) {
+		search(query: $query, limit: $limit) {
+			results {
+				collectionName
+				collectionId
+				collectionName
+				artworkUrl100
 			}
-		} else {
-			fetch('/api/top-podcasts', {
-				mode: 'cors'
-			})
-				.then(r => r.json())
-				.then((searchResults) => {
-					this.setState({
-						searchResults
-					})
-				})
-				.catch(e => console.error(e))
-
 		}
 	}
-	// componentDidUpdate(prevProps, prevState) {
-	// 	if (prevState.search !== this.state.search) {
-	// 		const params = new Map(window.location.search.slice(1)
-	// 								.split('&')
-	// 								.map((param) => param.split('=')))
-	// 		const query = params.get('q');
-	// 		if (query) {
-	// 			this.fetchSearchResults(query)
-	// 				.then((searchResults) => {
-	// 					this.setState({
-	// 						searchResults: searchResults.results,
-	// 						search: decodeURIComponent(query)
-	// 					})
-	// 				})
-	// 				.catch(e => console.error(e))
-	// 		}
-	// 	}
-	// }
-	fetchSearchResults(query) {
-		return fetch(`/api/search?q=${query}`, {
-			mode: 'cors'
-		}).then(r => r.json())
-	}
-	handleSearch = (evt) => {
-		evt.preventDefault();
-		const sanitizedSearch = encodeURIComponent(this.state.search);
-		this.props.history.push(`?q=${sanitizedSearch}`);
-		this.fetchSearchResults(sanitizedSearch)
-			.then((searchResults) => {
-				console.log(searchResults.results);
-				this.setState({
-					searchResults: searchResults.results
-				})
-			})
-			.catch(e => console.error(e))
+`
 
-	}
-	handleSearchChange = (evt) => {
-		this.setState({
-			search: evt.target.value
-		})
-	}
-	render() {
-		return (
-			<div>
-				<form action="" onSubmit={this.handleSearch}>
-					<input type="text" id="main-search" value={this.state.search} onChange={this.handleSearchChange} />
-					<button type='submit'>Submit</button>
-				</form>
+const Search = ({limit, query}) => (
+	<Query query={searchQuery} variables={{ limit, query }}>
+		{({error, loading, data}) => {
+			if (loading || error) return <div />
+			return (
 				<ol>
-					{this.state.searchResults.map((result) => (
+					{data.search.results.map((result) => (
 						<CollectionListItem key={result.collectionId} result={result} />
 					))}
 				</ol>
-			</div>
-		)
-	}
-}
+			)
+		}}
+	</Query>
+)
 
 export default Search;
