@@ -9,8 +9,12 @@ import {
 import Header from './Header.js';
 import LoginSignupModal from './Login.js'
 import LoginPage from './Login.js'
+import Footer from './Footer';
 
 class App extends Component {
+  state = {
+    episode: null
+  }
 
 	previousLocation = this.props.location
 
@@ -24,6 +28,13 @@ class App extends Component {
       this.previousLocation = this.props.location
     }
   }
+
+  handlePlay = (episode) => {
+    this.setState({
+      episode
+    })
+  }
+
   render() {
 		const { location } = this.props
     const isModal = !!(
@@ -33,13 +44,20 @@ class App extends Component {
     )
     return (
       <div className="App">
-				{isModal ? <Route path="/:login(signup|login)" component={LoginSignupModal} /> : null}
+				{/* {isModal ? <Route path="/:login(signup|login)" component={LoginSignupModal} /> : null} */}
 				<Header />
 				<Switch location={isModal ? this.previousLocation : location}>
 					<Route path="/" exact component={Home} />
-					<Route path="/podcasts/:id" component={EpisodeList} />
-					<Route path="/:login(signup|login)" component={LoginPage} />
+					<Route path="/podcasts/:id" render={(props) => <EpisodeList handlePlay={this.handlePlay} {...props} />} />
+					{/* <Route path="/:login(signup|login)" component={LoginPage} /> */}
 				</Switch>
+        {
+          this.state.episode && (
+            <footer>
+              <Footer episode={this.state.episode} />
+            </footer>
+          )
+        }
       </div>
     );
   }

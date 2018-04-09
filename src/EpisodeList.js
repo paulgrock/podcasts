@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import AudioPlayer from './AudioPlayer';
 import { Query } from 'react-apollo';
 import { gql } from 'apollo-boost';
+import format from 'date-fns/format';
 
 
 let lookupQuery = gql`
@@ -19,36 +19,25 @@ let lookupQuery = gql`
 				releaseDate
 				episodeUrl
 				trackTimeMillis
+				episodeUrl
+				artworkUrl60
+				trackViewUrl
 			}
 		}
 	}
 `
 class EpisodeList extends Component {
-	state = {
-		playing: false,
-		trackId: false
-	}
-	componentDidUpdate(oldProps, oldState) {
-		if (this.state.trackId !== oldState.trackId) {
-			this.setState({
-				playing: true
-			})
-		}
-	}
-	togglePlay = (src, trackId) => {
-		this.setState({
-			src,
-			playing: !this.state.playing,
-			trackId
-		})
-	}
 	formatTime(timeInMS) {
 		const minutes = Math.floor(timeInMS / 60000);
 		const seconds = ((timeInMS % 60000) / 1000).toFixed(0);
 		return (seconds === 60 ? ( minutes + 1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
 	}
+
+	formatDate(releaseDate) {
+		return format(releaseDate, 'MM/DD/YY');
+	}
 	render() {
-		const {history}  = this.props;
+		const {history, handlePlay} = this.props;
 		return (
 			<Query query={lookupQuery} variables={{id: history.location.state.id}}>
 				{({ error, loading, data: {podcast}}) => (
@@ -57,7 +46,7 @@ class EpisodeList extends Component {
 							<header>
 								<h1>{podcast.header.collectionName}</h1>
 								<img src={podcast.header.artworkUrl100} alt={podcast.header.collectionName}/>
-								<p>Latest release: {podcast.header.releaseDate}</p>
+								<p>Latest release: {this.formatDate(podcast.header.releaseDate)}</p>
 							</header>
 							: null
 						}
@@ -65,17 +54,14 @@ class EpisodeList extends Component {
 							{podcast && podcast.episodes && podcast.episodes.map((episode) => (
 								<li key={episode.trackId}>
 									<h2>{episode.trackName}</h2>
-									<button onClick={() => this.togglePlay(episode.episodeUrl, episode.trackId)}>{
-										this.state.trackId === episode.trackId &&
-										this.state.playing ? 'Pause' : 'Play'
-									}</button>
-									<p>Released: {episode.releaseDate}</p>
-									<time>Minutes: {this.formatTime(episode.trackTimeMillis)}</time>
+									<button onClick={() => handlePlay(episode)}>Play</button>
+									<p>Released: {this.formatDate(episode.releaseDate)}</p>
+									<time>Length: {this.formatTime(episode.trackTimeMillis)}</time>
+									{/* TODO: probably want to trim this */}
 									<p>Description: {episode.description}</p>
 								</li>
 							))}
 						</ol>
-						<AudioPlayer src={this.state.src} playing={this.state.playing} />
 					</div>
 				)}
 			</Query>
