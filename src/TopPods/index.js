@@ -11,22 +11,26 @@ let topPodcastsQuery = gql`
 			artworkUrl100
 		}
 	}
-`
+`;
 
 const TopPods = () => (
 	<Query query={topPodcastsQuery}>
-		{({error, loading, data}) => {
-			if (loading) return <div>Loading...</div>;
-			if (error) return <div>Error</div>;
+		{({ error, loading, data }) => {
+			if (loading) {
+				return <div>Loading...</div>;
+			}
+			if (error) {
+				return <div>Error</div>;
+			}
 			return (
 				<ol>
-					{data.topPods.map((result) => (
+					{data.topPods.map(result => (
 						<CollectionListItem key={result.collectionId} result={result} />
 					))}
 				</ol>
-			)
+			);
 		}}
 	</Query>
-)
+);
 
 export default TopPods;

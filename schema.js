@@ -5,16 +5,16 @@ import {
 	GraphQLList,
 	GraphQLInt,
 	GraphQLNonNull
-} from "graphql";
+} from 'graphql';
 
-import topPods from "./models/top-pods";
-import EpisodeListType from "./models/episodes-schema";
-import PodcastListType from "./models/podcast";
-import episodeListing from "./models/lookup";
-import search from "./models/search";
+import topPods from './models/top-pods';
+import EpisodeListType from './models/episodes-schema';
+import PodcastListType from './models/podcast';
+import episodeListing from './models/lookup';
+import search from './models/search';
 
 const TopPodType = new GraphQLObjectType({
-	name: "TopPod",
+	name: 'TopPod',
 	fields: {
 		collectionId: {
 			type: GraphQLString
@@ -29,7 +29,7 @@ const TopPodType = new GraphQLObjectType({
 });
 
 const PodcastType = new GraphQLObjectType({
-	name: "PodcastListing",
+	name: 'PodcastListing',
 	fields: {
 		header: {
 			type: PodcastListType
@@ -41,7 +41,7 @@ const PodcastType = new GraphQLObjectType({
 });
 
 const SearchType = new GraphQLObjectType({
-	name: "SearchListing",
+	name: 'SearchListing',
 	fields: {
 		results: {
 			type: new GraphQLList(PodcastListType)
@@ -52,10 +52,10 @@ const SearchType = new GraphQLObjectType({
 // Construct a schema, using GraphQL schema language
 var schema = new GraphQLSchema({
 	query: new GraphQLObjectType({
-		name: "Query",
+		name: 'Query',
 		fields: {
 			topPods: {
-				name: "topPods",
+				name: 'topPods',
 				args: {
 					limit: {
 						type: GraphQLInt
@@ -70,8 +70,8 @@ var schema = new GraphQLSchema({
 				}
 			},
 			podcast: {
-				name: "podcast",
-				description: "Fetch a specific podcast by id from itunes",
+				name: 'podcast',
+				description: 'Fetch a specific podcast by id from itunes',
 				type: PodcastType,
 				args: {
 					id: {
@@ -86,8 +86,8 @@ var schema = new GraphQLSchema({
 				}
 			},
 			search: {
-				name: "search",
-				deprecation: "Search for a podcast",
+				name: 'search',
+				deprecation: 'Search for a podcast',
 				type: SearchType,
 				args: {
 					query: {
@@ -101,26 +101,26 @@ var schema = new GraphQLSchema({
 					return await search(args);
 				}
 			}
-		},
+		}
 	}),
 	mutation: new GraphQLObjectType({
 		name: 'Mutation',
 		description: 'Changable things',
-		fields:() => ({
+		fields: () => ({
 			logSomething: {
 				type: new GraphQLObjectType({
 					name: 'mutationThing',
-					fields:() => ({
+					fields: () => ({
 						str: {
 							type: GraphQLString
 						}
 					})
 				}),
 				args: {
-					str: {type: new GraphQLNonNull(GraphQLString)}
+					str: { type: new GraphQLNonNull(GraphQLString) }
 				},
-				resolve: (_, {str}, something) => {
-					return {str};
+				resolve: (_, { str }) => {
+					return { str };
 				}
 			}
 		})

@@ -14,21 +14,23 @@ let searchQuery = gql`
 			}
 		}
 	}
-`
+`;
 
-const Search = ({limit, query}) => (
+const Search = ({ limit, query }) => (
 	<Query query={searchQuery} variables={{ limit, query }}>
-		{({error, loading, data}) => {
-			if (loading || error) return <div />
+		{({ error, loading, data }) => {
+			if (loading || error) {
+				return <div />;
+			}
 			return (
 				<ol>
-					{data.search.results.map((result) => (
+					{data.search.results.map(result => (
 						<CollectionListItem key={result.collectionId} result={result} />
 					))}
 				</ol>
-			)
+			);
 		}}
 	</Query>
-)
+);
 
 export default Search;

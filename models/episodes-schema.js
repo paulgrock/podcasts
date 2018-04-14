@@ -1,13 +1,7 @@
-import {
-	GraphQLSchema,
-	GraphQLObjectType,
-	GraphQLString,
-	GraphQLList,
-	GraphQLInt
-} from "graphql";
+import { GraphQLObjectType, GraphQLString, GraphQLInt } from 'graphql';
 
 const EpisodeListType = new GraphQLObjectType({
-	name: "EpisodeList",
+	name: 'EpisodeList',
 	fields: {
 		artworkUrl160: { type: GraphQLString },
 		artworkUrl600: { type: GraphQLString },

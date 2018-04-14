@@ -3,7 +3,6 @@ import { Query } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import format from 'date-fns/format';
 
-
 let lookupQuery = gql`
 	query podcastQuery($id: Int!) {
 		podcast(id: $id) {
@@ -25,47 +24,57 @@ let lookupQuery = gql`
 			}
 		}
 	}
-`
+`;
 class EpisodeList extends Component {
 	formatTime(timeInMS) {
 		const minutes = Math.floor(timeInMS / 60000);
 		const seconds = ((timeInMS % 60000) / 1000).toFixed(0);
-		return (seconds === 60 ? ( minutes + 1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+		return seconds === 60
+			? minutes + 1 + ':00'
+			: minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 	}
 
 	formatDate(releaseDate) {
 		return format(releaseDate, 'MM/DD/YY');
 	}
 	render() {
-		const {history, handlePlay} = this.props;
+		const { history, handlePlay } = this.props;
 		return (
-			<Query query={lookupQuery} variables={{id: history.location.state.id}}>
-				{({ error, loading, data: {podcast}}) => (
+			<Query query={lookupQuery} variables={{ id: history.location.state.id }}>
+				{({ error, loading, data: { podcast } }) => (
 					<div>
-						{podcast && podcast.header ?
+						{podcast && podcast.header ? (
 							<header>
 								<h1>{podcast.header.collectionName}</h1>
-								<img src={podcast.header.artworkUrl100} alt={podcast.header.collectionName}/>
-								<p>Latest release: {this.formatDate(podcast.header.releaseDate)}</p>
+								<img
+									src={podcast.header.artworkUrl100}
+									alt={podcast.header.collectionName}
+								/>
+								<p>
+									Latest release: {this.formatDate(podcast.header.releaseDate)}
+								</p>
 							</header>
-							: null
-						}
+						) : null}
 						<ol>
-							{podcast && podcast.episodes && podcast.episodes.map((episode) => (
-								<li key={episode.trackId}>
-									<h2>{episode.trackName}</h2>
-									<button onClick={() => handlePlay(episode)}>Play</button>
-									<p>Released: {this.formatDate(episode.releaseDate)}</p>
-									<time>Length: {this.formatTime(episode.trackTimeMillis)}</time>
-									{/* TODO: probably want to trim this */}
-									<p>Description: {episode.description}</p>
-								</li>
-							))}
+							{podcast &&
+								podcast.episodes &&
+								podcast.episodes.map(episode => (
+									<li key={episode.trackId}>
+										<h2>{episode.trackName}</h2>
+										<button onClick={() => handlePlay(episode)}>Play</button>
+										<p>Released: {this.formatDate(episode.releaseDate)}</p>
+										<time>
+											Length: {this.formatTime(episode.trackTimeMillis)}
+										</time>
+										{/* TODO: probably want to trim this */}
+										<p>Description: {episode.description}</p>
+									</li>
+								))}
 						</ol>
 					</div>
 				)}
 			</Query>
-		)
+		);
 	}
 }
 

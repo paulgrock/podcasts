@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './index.css';
 
 class Login extends Component {
@@ -8,7 +8,7 @@ class Login extends Component {
 	};
 
 	render() {
-		const {username, password} = this.state;
+		const { username, password } = this.state;
 		return (
 			<div className="modal-container" onClick={this.close}>
 				<div className="modal">

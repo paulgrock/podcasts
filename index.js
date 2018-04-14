@@ -1,2 +1,4 @@
-require = require("esm")(module);
-require("./server.js").default();
+/* eslint-disable no-global-assign */
+require = require('esm')(module);
+/* eslint-enable no-global-assign */
+require('./server.js').default();

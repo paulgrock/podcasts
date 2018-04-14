@@ -31,11 +31,13 @@ import fetchItunesJsonAndParse from './fetch-and-parse';
 }
  */
 
-export default async function ({id, limit = 5}) {
-	const episodeListing = await fetchItunesJsonAndParse(`https://itunes.apple.com/lookup?id=${id}&country=us&media=podcast&entity=podcastEpisode&limit=${limit}`)
+export default async function({ id, limit = 5 }) {
+	const episodeListing = await fetchItunesJsonAndParse(
+		`https://itunes.apple.com/lookup?id=${id}&country=us&media=podcast&entity=podcastEpisode&limit=${limit}`
+	);
 	let { results } = episodeListing;
 	return {
 		header: results.find(result => result.kind === 'podcast'),
 		episodes: results.filter(result => result.kind !== 'podcast')
-	}
-};
+	};
+}
