@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './Modal.css';
+import './index.css';
 
 class Login extends Component {
 	close = evt => {

@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import './App.css';
-import Home from './Home';
-import EpisodeList from './EpisodeList';
+import './index.css';
+import Home from '../Home';
+import EpisodeList from '../EpisodeList';
 import {
 	Route,
 	Switch
 } from 'react-router-dom';
-import Header from './Header.js';
-import LoginSignupModal from './Login.js'
-import LoginPage from './Login.js'
-import Footer from './Footer';
+import Header from '../Header';
+import Footer from '../Footer';
 
 class App extends Component {
   state = {
@@ -44,12 +42,10 @@ class App extends Component {
     )
     return (
       <div className="App">
-				{/* {isModal ? <Route path="/:login(signup|login)" component={LoginSignupModal} /> : null} */}
 				<Header />
 				<Switch location={isModal ? this.previousLocation : location}>
 					<Route path="/" exact component={Home} />
 					<Route path="/podcasts/:id" render={(props) => <EpisodeList handlePlay={this.handlePlay} {...props} />} />
-					{/* <Route path="/:login(signup|login)" component={LoginPage} /> */}
 				</Switch>
         {
           this.state.episode && (

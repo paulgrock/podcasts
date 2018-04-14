@@ -1,5 +1,5 @@
 import React from 'react';
-import CollectionListItem from './CollectionListItem';
+import CollectionListItem from '../CollectionListItem';
 import { Query } from 'react-apollo';
 import { gql } from 'apollo-boost';
 

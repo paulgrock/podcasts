@@ -1,6 +1,6 @@
 import React from 'react';
-import AudioPlayer from './AudioPlayer';
-import './Footer.css';
+import AudioPlayer from '../AudioPlayer';
+import './index.css';
 
 const Footer = (props) => {
     return (

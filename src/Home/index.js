@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import TopPods from './TopPods';
-import Search from './Search';
+import TopPods from '../TopPods';
+import Search from '../Search';
 
 class Home extends Component {
 	state = {
