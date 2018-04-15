@@ -582,3 +582,36 @@
 //        }
 //     ]
 //  }
+
+import { buildSchema } from 'graphql';
+
+const JSONFeed = buildSchema(`
+	type JSONFeedItem {
+		title: String
+		id: String
+		url: String
+		external_url: String
+		author: {
+			name: String
+		},
+		content_html: String
+	}
+
+	type JSONFeedAuthor {
+		url: String,
+		name: String
+	}
+
+	type JSONFeed {
+		version: String,
+		title: String,
+		home_page_url: String,
+		feed_url: String,
+		icon: String,
+		favicon: String,
+		author: JSONFeedAuthor,
+		items: [JSONFeedItem]
+	}
+`);
+
+export default JSONFeed;

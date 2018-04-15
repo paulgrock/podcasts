@@ -1,4 +1,4 @@
-import fetchItunesJsonAndParse from './fetch-and-parse';
+import fetchJsonAndParse from './fetch-and-parse';
 /**
  * episode format
  * {
@@ -32,7 +32,7 @@ import fetchItunesJsonAndParse from './fetch-and-parse';
  */
 
 export default async function({ id, limit = 5 }) {
-	const episodeListing = await fetchItunesJsonAndParse(
+	const episodeListing = await fetchJsonAndParse(
 		`https://itunes.apple.com/lookup?id=${id}&country=us&media=podcast&entity=podcastEpisode&limit=${limit}`
 	);
 	let { results } = episodeListing;

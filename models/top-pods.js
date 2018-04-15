@@ -1,7 +1,7 @@
-import fetchItunesJsonAndParse from './fetch-and-parse';
+import fetchJsonAndParse from './fetch-and-parse';
 
 export default async function({ limit = 10 }) {
-	const topPodsJSON = await fetchItunesJsonAndParse(
+	const topPodsJSON = await fetchJsonAndParse(
 		`https://itunes.apple.com/us/rss/toppodcasts/limit=${limit}/json`
 	);
 	if (limit === 1) {
