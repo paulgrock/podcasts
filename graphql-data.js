@@ -1,20 +1,24 @@
-import { buildSchema } from 'graphql';
-import fetchJsonAndParse from './models/fetch-and-parse';
+import fetchJsonAndParse from './resolvers/fetch-and-parse';
+import topPodResolver from './resolvers/top-pods';
+import episodeListing from './resolvers/lookup';
+import searchResolver from './resolvers/search';
 
-import topPods from './models/top-pods';
-import episodeListing from './models/lookup';
-import search from './models/search';
-
-const schema = buildSchema(`
+const typeDefs = `
 	type Query {
+		"""
+		The top podcasts at the moment
+		"""
 		topPods(limit: Int, offset: Int): [TopPod]
-		podcast(id: Int!, limit: Int): Podcast
+		podcast(id: ID!, limit: Int): Podcast
+		"""
+		Search itunes podcast directory by name
+		"""
 		search(query: String, limit: Int): Search
 		jsonFeed(url: String!): JSONFeed
 	}
 
 	type TopPod {
-		collectionId: String,
+		collectionId: ID,
 		collectionName: String,
 		artworkUrl100: String
 	}
@@ -44,12 +48,12 @@ const schema = buildSchema(`
 		wrapperType: String,
 		country: String,
 		description: String,
-		episodeGuid: String,
+		episodeGuid: ID,
 		kind: String,
-		trackId: Int,
+		trackId: ID,
 		trackName: String,
 		releaseDate: String,
-		collectionId: Int,
+		collectionId: ID,
 		collectionName: String,
 		feedUrl: String,
 		closedCaptioning: String
@@ -58,8 +62,8 @@ const schema = buildSchema(`
 	type PodcastHeader {
 		wrapperType: String,
 		kind: String,
-		collectionId: Int,
-		trackId: Int,
+		collectionId: ID,
+		trackId: ID,
 		artistName: String,
 		collectionName: String,
 		trackName: String,
@@ -101,7 +105,7 @@ const schema = buildSchema(`
 
 	type JSONFeedItem {
 		title: String
-		id: String
+		id: ID
 		url: String
 		external_url: String
 		author: JSONFeedAuthor,
@@ -112,13 +116,15 @@ const schema = buildSchema(`
 		url: String,
 		name: String
 	}
-`);
+`;
 
-const rootValue = {
-	topPods: async args => await topPods(args),
-	podcast: async args => await episodeListing(args),
-	search: async args => await search(args),
-	jsonFeed: async ({ url }) => await fetchJsonAndParse(url)
+const resolvers = {
+	Query: {
+		topPods: async (_, args) => await topPodResolver(args),
+		podcast: async (_, args) => await episodeListing(args),
+		search: async (_, args) => await searchResolver(args),
+		jsonFeed: async (_, { url }) => await fetchJsonAndParse(url)
+	}
 };
 
-export { schema, rootValue };
+export { typeDefs, resolvers };

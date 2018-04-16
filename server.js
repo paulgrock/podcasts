@@ -2,16 +2,17 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 // import expressSession from 'express-session';
-import { schema, rootValue } from './graphql-data';
-import graphqlHTTP from 'express-graphql';
+import { typeDefs, resolvers } from './graphql-data';
+import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
 
 const app = express();
-app.use(bodyParser.json());
-app.use(
-	bodyParser.urlencoded({
-		extended: true
-	})
-);
+// app.use(bodyParser.json());
+// app.use(
+// 	bodyParser.urlencoded({
+// 		extended: true
+// 	})
+// );
 
 app.set('port', process.env.SERVER_PORT || 3001);
 
@@ -39,12 +40,23 @@ app.get('/', (req, res) => {
 	res.send('ok');
 });
 
+const schema = makeExecutableSchema({
+	typeDefs,
+	resolvers
+});
+
 app.use(
 	'/api/graphql',
-	graphqlHTTP({
-		schema,
-		rootValue,
-		graphiql: process.env.NODE_ENV !== 'production'
+	bodyParser.json(),
+	graphqlExpress({
+		schema
+	})
+);
+
+app.use(
+	'/api/graphiql',
+	graphiqlExpress({
+		endpointURL: '/api/graphql'
 	})
 );
 
