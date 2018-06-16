@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import './index.css';
-import Home from '../Home';
-import EpisodeList from '../EpisodeList';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { Route, Switch } from 'react-router-dom';
-import Header from '../Header';
+import EpisodeList from '../EpisodeList';
 import Footer from '../Footer';
+import Header from '../Header';
+import Home from '../Home';
+import './index.css';
 
 class App extends Component {
 	state = {
@@ -40,15 +41,19 @@ class App extends Component {
 		return (
 			<div className="App">
 				<Header />
-				<Switch location={isModal ? this.previousLocation : location}>
-					<Route path="/" exact component={Home} />
-					<Route
-						path="/podcasts/:id"
-						render={props => (
-							<EpisodeList handlePlay={this.handlePlay} {...props} />
-						)}
-					/>
-				</Switch>
+				<TransitionGroup>
+					<CSSTransition timeout={300} classNames="fade" key={location.key}>
+						<Switch location={isModal ? this.previousLocation : location}>
+							<Route path="/" exact component={Home} />
+							<Route
+								path="/podcasts/:id"
+								render={props => (
+									<EpisodeList handlePlay={this.handlePlay} {...props} />
+								)}
+							/>
+						</Switch>
+					</CSSTransition>
+				</TransitionGroup>
 				{this.state.episode && (
 					<footer>
 						<Footer episode={this.state.episode} />

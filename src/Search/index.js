@@ -4,7 +4,7 @@ import { Query } from 'react-apollo';
 import { gql } from 'apollo-boost';
 
 let searchQuery = gql`
-	query podcastQuery($query: String!, $limit: Int = 10) {
+	query searchQuery($query: String!, $limit: Int = 10) {
 		search(query: $query, limit: $limit) {
 			results {
 				collectionName
